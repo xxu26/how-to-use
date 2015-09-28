@@ -1,3 +1,5 @@
 # how-to-use
-practice how to use Github
-how to format Markdown file 
+Data Science & Machine Learning 
+1. Github usage
+2. Mardown format
+3. Machine Learning
