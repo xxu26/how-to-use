@@ -1,4 +1,6 @@
 #http://www.statsblogs.com/2014/02/10/how-dplyr-replaced-my-most-common-r-idioms/
+#https://cran.rstudio.com/web/packages/dplyr/vignettes/introduction.html
+#ggplot is all about layer after layer
 
 library(dplyr)
 crime.by.state <- read.csv("CrimeStatebyState.csv", header=T)
@@ -64,3 +66,23 @@ summary.crime.ny.2005 <- merge(summary1, summary2,by="Type.of.Crime")
 # dplyr
 by.type <- group_by(crime.ny.2005, Type.of.Crime)
 summary.crime.ny.2005 <- summarise(by.type,num.types = n(),counts = sum(Count))
+
+
+#Roger Peng book page60--pipeline  first(x) %>% second %>% third, dataset is chicago
+#group_by and summarize can be used with functions from other packages
+mutate(chicago, pm25.quint = cut(pm25, qq)) %>%
+      group_by(pm25.quint) %>%
+      summarize(o3 = mean(o3tmean2, na.rm = TRUE), 
+                no2 = mean(no2tmean2, na.rm = TRUE))
+
+filter(
+  summarise(
+    select(
+      group_by(flights, year, month, day),
+      arr_delay, dep_delay
+    ),
+    arr = mean(arr_delay, na.rm = TRUE),
+    dep = mean(dep_delay, na.rm = TRUE)
+  ),
+  arr > 30 | dep > 30
+)
