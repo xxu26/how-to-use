@@ -83,6 +83,13 @@ confusion_matrix
 accuracy <- sum(iris_pred==iris.testLabels)/length(iris.testLabels)
 accuracy
 
+#Method3 ROC curver
+library(pROC)
+roc_curve <- roc(c(iris.testLabels), c(iris_pred))
+plot.roc(roc_curve, col="green", main="ROC curves, full dataset", lwd=8)
+#legend("bottom", bty = 'n',legend=c("80/20","70/30","50/50","90/10"), col=c("green", "gold","orange","red"), lwd=8)
+
+
 
 
 #Logistic model evaluation
