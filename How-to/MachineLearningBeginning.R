@@ -60,16 +60,45 @@ iris.test <- iris[ind==2, 1:4]
 iris.trainLabels <- iris[ind==1, 5]
 iris.testLabels <- iris[ind==2, 5]
 
+
 #Step 6: algorithms, here KNN # build the classifier
 iris_pred <- knn(train = iris.training, test = iris.test, cl = iris.trainLabels, k=3) 
 #The result of this function is a factor vector with the predicted classes for each row of the test data.
 
+#method 2 SVM
+#install.packages("kernlab")
+#library(kernlab)
+#iris_pred <- ksvm(x = iris.training, y = iris.trainLabels, type = "C-svc", kernel = 'vanilladot', C = 100, scaled = c()) 
+
 iris_pred
 
 #Step 7: evaluate your model
-#install.packages("gmodels")
+#Method 1 install.packages("gmodels")
 library(gmodels)
 CrossTable(x = iris.testLabels, y = iris_pred, prop.chisq=FALSE)
+
+#Method 2 confusion matrix
+confusion_matrix <- table(iris.testLabels, iris_pred)
+confusion_matrix
+accuracy <- sum(iris_pred==iris.testLabels)/length(iris.testLabels)
+accuracy
+
+
+
+#Logistic model evaluation
+
+logisticPseudoR2s <- function(LogModel) {
+        dev <- LogModel$deviance 
+        nullDev <- LogModel$null.deviance 
+        modelN <-  length(LogModel$fitted.values)
+        R.l <-  1 -  dev / nullDev
+        R.cs <- 1- exp ( -(nullDev - dev) / modelN)
+        R.n <- R.cs / ( 1 - ( exp (-(nullDev / modelN))))
+        cat("Pseudo R^2 for logistic regression\n")
+        cat("Hosmer and Lemeshow R^2  ", round(R.l, 3), "\n")
+        cat("Cox and Snell R^2        ", round(R.cs, 3), "\n")
+        cat("Nagelkerke R^2           ", round(R.n, 3),    "\n")
+}
 
 
 
