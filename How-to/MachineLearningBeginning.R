@@ -4,7 +4,6 @@
 #Step 1: get the data
 iris #type in the console
 
-
 #Step 2:  Know your data, making some graphs, data range
 head(iris)
 str(iris)
@@ -48,10 +47,12 @@ normalize <- function(x) {
         return (num/denom)
 }
 
+
 class(iris)
 iris_norm <- as.data.frame(lapply(iris[1:4], normalize))
 #if not use as.data.frame, otherwise it's a list of lists
 summary(iris_norm)
+
 
 set.seed(1234) #split data into train and test sets
 ind <- sample(2, nrow(iris), replace=TRUE, prob=c(0.67, 0.33))
@@ -59,6 +60,8 @@ iris.training <- iris[ind==1, 1:4]
 iris.test <- iris[ind==2, 1:4]
 iris.trainLabels <- iris[ind==1, 5]
 iris.testLabels <- iris[ind==2, 5]
+#ntrain.55 <- round(n*0.5) # number of training examples
+#tindex.55 <- sample(n,ntrain.55, replace=FALSE) # indices of training samples, this step is for creating sets for SVM
 
 
 #Step 6: algorithms, here KNN # build the classifier
@@ -106,8 +109,6 @@ logisticPseudoR2s <- function(LogModel) {
         cat("Cox and Snell R^2        ", round(R.cs, 3), "\n")
         cat("Nagelkerke R^2           ", round(R.n, 3),    "\n")
 }
-
-
 
 
 
