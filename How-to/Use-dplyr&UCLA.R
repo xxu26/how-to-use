@@ -87,14 +87,12 @@ filter(
   arr > 30 | dep > 30
 )
 
-
-###UCLA
-#http://www.ats.ucla.edu/stat/r/seminars/intro.R
-
-
+#*************************************************************************************************************
+#*************************************************************************************************************
+#http://www.ats.ucla.edu/stat/r/seminars/intro.htm
+###UCLA  #http://www.ats.ucla.edu/stat/r/seminars/intro.R
 
 opts_chunk$set(fig.path='figures/intro-')
-
 
 #install.packages("foreign")
 #install.packages("xlsx")
@@ -105,7 +103,6 @@ opts_chunk$set(fig.path='figures/intro-')
 #install.packages("vcd")
 
 
-
 library(foreign)
 library(xlsx)
 library(dplyr)
@@ -113,8 +110,14 @@ library(reshape2)
 require(ggplot2)
 require(GGally)
 require(vcd)
-
-
+#For the purposes of this seminar, we will be using the following packages frequently:
+#foreign package to read data files from other stats packages
+#xlsx package (requires Java to be installed, same architecture as your R version, also the rJava package and xlsxjars package)
+#dplyr package for various data management tasks
+#reshape2 package to easily melt data to long form
+#ggplot2 package for elegant data visualization using the Grammar of Graphics
+#GGally package for scatter plot matrices
+#vcd package for visualizing and analyzing categorical data
 
 # foreign ships with R so no need to install
 require(xlsx) || {install.packages("xlsx"); require(xlsx)}
@@ -123,18 +126,16 @@ require(ggplot2) || {install.packages("ggplot2"); require(ggplot2)}
 require(GGally) || {install.packages("GGally"); require(GGally)}
 require(vcd) || {install.packages("vcd"); require(vcd)}
 
-
-
 sessionInfo()
-
+#To get a description of the version of R and its attached packages used in the current session, 
+#we can use the sessionInfo function
 ?require
 
+###Entering Data
 # assign the number 3 to object called abc
 abc <- 3
 # list all objects in current session
 ls()
-
-
 
 # comma separated values
 dat.csv <- read.csv("http://www.ats.ucla.edu/stat/data/hsb2.csv")
@@ -142,26 +143,23 @@ dat.csv <- read.csv("http://www.ats.ucla.edu/stat/data/hsb2.csv")
 dat.tab <- read.table("http://www.ats.ucla.edu/stat/data/hsb2.txt",
   header=TRUE, sep = "\t")
 
+##Read data
 ?read.csv
-
 require(foreign)
+#we can read in datasets from other statistical analysis software using functions found in the foreign package
 # SPSS files
-dat.spss <- read.spss("http://www.ats.ucla.edu/stat/data/hsb2.sav",
-  to.data.frame=TRUE)
+dat.spss <- read.spss("http://www.ats.ucla.edu/stat/data/hsb2.sav", to.data.frame=TRUE)
 # Stata files
 dat.dta <- read.dta("http://www.ats.ucla.edu/stat/data/hsb2.dta")
 
 
-
+#use xlsx and Java to download an Excel dataset
 # these two steps only needed to read excel files from the internet
 f <- tempfile("hsb2", fileext=".xls")
-
 download.file("http://www.ats.ucla.edu/stat/data/hsb2.xls", f, mode="wb")
-
 dat.xls <- read.xlsx(f, sheetIndex=1)
 
-
-
+##Viewing data
 # first few rows
 head(dat.csv)
 # last few rows
@@ -172,7 +170,7 @@ colnames(dat.csv)
 # View(dat.csv)
 
 
-
+##Data frames object[row, column], object[, "variable"], object$variable
 # single cell value
 dat.csv[2,3]
 # omitting row value implies all rows; here all rows in column 3
@@ -182,174 +180,116 @@ dat.csv[2,]
 # can also use ranges - rows 2 and 3, columns 2 and 3
 dat.csv[2:3, 2:3]
 
-
-
 # get first 10 rows of variable female using two methods
 dat.csv[1:10, "female"]
 dat.csv$female[1:10]
 
-
-
-# get column 1 for rows 1, 3 and 5
+# get column 1 for rows 1, 3 and 5--combine values into a vector
 dat.csv[c(1,3,5), 1]
 # get row 1 values for variables female, prog and socst
 dat.csv[1,c("female", "prog", "socst")]
 
-
-
+##Variable names, colnames()
 colnames(dat.csv) <- c("ID", "Sex", "Ethnicity", "SES", "SchoolType",
   "Program", "Reading", "Writing", "Math", "Science", "SocialStudies")
 
 # to change one variable name, just use indexing
 colnames(dat.csv)[1] <- "ID2"
 
-
-
+##Save data, write.dta from foreign, write.xlsx from xlsx
 #write.csv(dat.csv, file = "path/to/save/filename.csv")
-
 #write.table(dat.csv, file = "path/to/save/filename.txt", sep = "\t", na=".")
-
 #write.dta(dat.csv, file = "path/to/save/filename.dta")
-
 #write.xlsx(dat.csv, file = "path/to/save/filename.xlsx", sheetName="hsb2")
-
 # save to binary R format (can save multiple datasets and R objects)
 #save(dat.csv, dat.dta, dat.spss, dat.txt, file = "path/to/save/filename.RData")
 
-
-
+##Exploring data
 d <- read.csv("http://www.ats.ucla.edu/stat/data/hsb2.csv")
-
-
 
 dim(d)
 str(d)
 
-
-
 summary(d)
-
-
-
+#conditonal summary
 summary(filter(d, read >= 60))
-
-
-
+#conditional summary2
 by(d[, 7:11], d$prog, colMeans)
 
-
-
+#Visualize data
 ggplot(d, aes(x = write)) + geom_histogram()
-
-
-
 ggplot(d, aes(x = write)) + geom_density()
-
-
-
 ggplot(d, aes(x = 1, y = math)) + geom_boxplot()
 
-
-
+#conditional visualization
 # density plots by program type
 ggplot(d, aes(x = write)) + geom_density() + facet_wrap(~ prog)
-
-
-
+conditioinal visualization2
 ggplot(d, aes(x = factor(prog), y = math)) + geom_boxplot()
-
-
-
+#melt, reshape data from wide format to long format
 ggplot(melt(d[, 7:11]), aes(x = variable, y = value)) + geom_boxplot()
-
-
 
 ggplot(melt(d[, 6:11], id.vars = "prog"),
        aes(x = variable, y = value, fill = factor(prog))) +
   geom_boxplot()
 
 
-
 # load lattice
 require(lattice)
-
 # simple scatter plot
 xyplot(read ~ write, data = d)
-
 # conditioned scatter plot
 xyplot(read ~ write | prog, data = d)
-
 # conditioning on two variables
 xyplot(read ~ write | prog * schtyp, data = d)
-
 # box and whisker plots
 bwplot(read ~ factor(prog), data = d)
 
-
-
+##Categorical Data
 xtabs( ~ female, data = d)
 xtabs( ~ race, data = d)
 xtabs( ~ prog, data = d)
 
-
-
+#two-way cross tabs
 xtabs( ~ ses + schtyp, data = d)
 
-
-
+#three-way cross tabs
 (tab3 <- xtabs( ~ ses + prog + schtyp, data = d))
-
-
 
 (tab2 <- xtabs( ~ ses + schtyp, data = d))
 set.seed(10)
 (testtab2 <- coindep_test(tab2, n = 5000))
 
-
-
-# simple mosaic plot
+#The area of each cell in a mosaic plot corresponds to the frequency from the crosstabls, mosaic comes from vcd package
+#simple mosaic plot
 mosaic(tab2)
-
-
 
 mosaic(tab2, gp = shading_hsv,
   gp_args = list(p.value = testtab2$p.value, interpolate = -1:2))
 
-
-
 cotabplot(~ ses + prog | schtyp, data = d, panel = cotab_coindep, n = 5000)
 
-
-
+#Correlation: As a last step in our data exploration, we would like some quick looks at bivariate (pairwise) relationships in our data.
+#Correlation matrices provide quick summaries of these pairwise relationships.
+#If there are no missing data, we can use the cor function with default arguments. 
+#Otherwise, we could use the use argument to get listwise or pairwise deletion. 
 cor(d[, 7:11])
-
-
-
 cor(d[, 7:11], use = "complete.obs")
-
-
-
 cor(d[, 7:11], use = "pairwise.complete.obs")
+#visual summaries, continuous variables
+ggpairs(d[, 7:11]) #inspect univariate and bivariate relationships using a scatter plot matrix.
 
-
-
-ggpairs(d[, 7:11])
-
-
-
+#Modifying Data
 # read data in and store in an easy to use name to save typing
 d <- read.csv("http://www.ats.ucla.edu/stat/data/hsb2.csv")
 
-
-
+#sorting data
 library(dplyr)
 d <- arrange(d, female, math)
 head(d)
 
-
-
-
 #library(dplyr)
+#coding categorical variables as factors
 str(d)
 d <- mutate(d,
             id = factor(id),
@@ -359,13 +299,11 @@ d <- mutate(d,
             prog = factor(prog, levels = 1:3, labels = c("general", "academic", "vocational"))
 )
 
-
-
+#results
 str(d)
 summary(d)
 
-
-
+#scorint and recoding
 d <- mutate(d,
             total = read+write+math+science,
             grade = cut(total,
@@ -376,8 +314,7 @@ d <- mutate(d,
 # view results
 summary(d[, c("total", "grade")])
 
-
-
+#Standardize and average, scale() change the scale, not the data; log() change the data itself
 #library(dplyr)
 d <- mutate(d, 
             zread = as.numeric(scale(read)),
@@ -386,101 +323,76 @@ d <- mutate(d,
 
 head(d[, c("read", "zread", "readmean")])
 
-
-
+#Scoring 
 d$rowmean <- rowMeans(d[, 7:10], na.rm=TRUE)
 
 
-
+#Managing Data
 getwd()
-list.files()
-#setwd("/path/to/directory")
-
-
-
+list.files() #setwd("/path/to/directory")
+#subset observations
 dfemale <- filter(d, female == "female")
 dmale <- filter(d, female == "male")
 
-
-
+#subset variables
 # note that select is special, so we do not need to quote the variable names
 duse <- select(d, id, female, read, write)
 # note the - preceding c(female... , which means drop these variables
 ddropped <- select(d, -c(female, read, write))
 
-
-
+#add observations(appending)
 dboth <- rbind(dfemale, dmale)
 dim(dfemale)
 dim(dmale)
 dim(dboth)
 
-
-
+#Merging data, by.x = "id.x", by.y = "id.y"
 dall <- merge(duse, ddropped, by = "id", all = TRUE)
 dim(duse)
 dim(ddropped)
 dim(dall)
 
 
-
+#Analyzing data:
+#Analyze categorical data: we often analyze relationships between categorical variables using chi square tests.
+#chisq.test can use raw data, or you can give it a frequency table
 (tab <- xtabs(~ ses + schtyp, data = d))
 chisq.test(tab)
 
-
-
 chisq.test(tab, simulate.p.value=TRUE, B = 90000)
 
-
-
+#t-test peforms t-tests, used to compare pairs of means
 t.test(d$write, mu = 50)
 with(d, t.test(write, read, paired = TRUE))
-
-
 
 t.test(write ~ female, data = d, var.equal=TRUE)
 t.test(write ~ female, data = d)
 
-
-
+#ANOVA and Regression
 m <- lm(write ~ prog * female, data = d)
 anova(m)
 summary(m)
 
-
-
 summary(m2 <- update(m, . ~ . + read))
 
-
-
+#Regression Diagnostics
 par(mfrow = c(2, 2))
 plot(m2)
 
-
-
 plot(density(resid(m2)))
 
-
-
 summary(m3 <- lm(write ~ prog * read, data = d))
-
-
 
 m3b <- update(m3, . ~ . - prog:read)
 anova(m3b, m3)
 
-
-
+#Estimtated means
 newdat <- with(d, expand.grid(prog = levels(prog), female = levels(female)))
 (newdat <- cbind(newdat, predict(m, newdat, se=TRUE)))
-
-
 
 ggplot(newdat, aes(x = prog, y = fit, colour = female)) +
   geom_errorbar(aes(ymin = fit - se.fit, ymax = fit + se.fit), width=.25) +
   geom_point(size=3)
-
-
 
 colnames(newdat)[1:3] <- c("Program", "Sex", "Write")
 
@@ -488,43 +400,37 @@ ggplot(newdat, aes(x = Program, y = Write, colour = Sex)) +
   geom_errorbar(aes(ymin = Write - se.fit, ymax = Write + se.fit), width=.25) +
   geom_point(size=3)
 
-
-
+#Logistic Regression
 m4 <- glm(schtyp ~ ses + read, data = d, family = binomial)
 summary(m4)
 
-
-
+#Odds ratios are common to report in logistic regression. These are just the exponentiated coefficients. coef() extract coefficients,
+#exp() exponentiate them
 exp(coef(m4))
-
-
 
 confint(m4)
 exp(confint(m4))
 
-
-
+#Predicted probabilities
+#For the ANOVA, we got estimated cell means. 
+#For logistic regression, let's get the predicted probabilities. 
 newdat <- expand.grid(ses = unique(d$ses), read = seq(min(d$read), max(d$read)))
 newdat$PredictedProbability <- predict(m4, newdat, type = "response")
-
-
 
 ggplot(newdat, aes(x = read, y = PredictedProbability, colour = factor(ses))) +
   geom_line()
 
-
-
+#Nonparametric tests: We can use nonparametric tests when we are not sure what our data meet the distributional assumptions of the statistical inferences
+#tests we would like to use. Actually, parametric works well even non-normally distributed continuous data
+#http://blog.minitab.com/blog/adventures-in-statistics/choosing-between-a-nonparametric-test-and-a-parametric-test
 # equivalent of one sampe t-test
 wilcox.test(d$write, mu = 50)
 
 # Wilcoxon sign-ranked test, equivalent of paired samples t-test
 with(d, wilcox.test(write, read, paired=TRUE))
 
-
-
 # Wilcoxon test, equivalent of indepdent samples t-test
 wilcox.test(write ~ female, data = d)
-
 
 # Kruskal-Wallis test, equivalent of one-way ANOVA
 kruskal.test(write ~ prog, data = d)
