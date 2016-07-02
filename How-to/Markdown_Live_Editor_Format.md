@@ -60,3 +60,15 @@ example_kelvin <- 282.15
 ```
 
 For example, `r example_kelvin` degrees Kelvin corresponds to `r example_kelvin - 273.15` degrees Celsius.
+
+
+##How to write informative documentation
+
+1. Design Approaches
+2. Tips and Tricks
+3. Special functions, commands and instructions
+4. Lessons learnt
+5. Peculiar situations
+6. Debugging methods
+7. Best Practices
+8. Anything which can help you in future
